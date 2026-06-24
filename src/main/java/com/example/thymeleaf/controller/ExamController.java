@@ -25,6 +25,11 @@ public class ExamController {
         this.examService = examService;
     }
 
+    @GetMapping("/")
+    public String redirectToExam() {
+        return "redirect:/exam";
+    }
+
     @GetMapping("/exam")
     public String listExams(Model model) {
         List<Exam> cet6Exams = examService.getExamsByType("cet6");
