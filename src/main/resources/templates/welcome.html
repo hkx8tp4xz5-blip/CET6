@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container welcome-box">
+    <h1>欢迎你，<span th:text="${name}">用户名</span>！</h1>
+    <p>登录成功！</p>
+    <div class="time-display">
+        当前系统时间：<span th:text="${#dates.format(today, 'yyyy年MM月dd日 HH:mm:ss')}">日期时间</span>
+    </div>
+
+    <p style="margin-top:30px;">
+        <a style="color:#4CAF50; font-size:16px;" th:href="@{/deptList}">查看部门列表 &rarr;</a>
+    </p>
+</div>
+
+<div th:replace="~{common::foot(year=2025, company='JavaEE实验')}"></div>
+</body>
+</html>

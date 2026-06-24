@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>部门列表</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h2>部门选择</h2>
+    <div class="form-group dept-select">
+        <label>请选择部门：</label>
+        <select>
+            <option value="">-- 请选择 --</option>
+            <option th:each="dept : ${depts}" th:text="${dept.name}" th:value="${dept.id}">部门名称</option>
+        </select>
+    </div>
+
+    <div style="margin-top:30px;">
+        <h3>部门列表（th:each 循环结果展示）：</h3>
+        <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+            <thead>
+            <tr style="background-color:#4CAF50; color:white;">
+                <th>部门编号</th>
+                <th>部门名称</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dept : ${depts}">
+                <td th:text="${dept.id}">1</td>
+                <td th:text="${dept.name}">研发部</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p style="margin-top:20px;">
+        <a style="color:#4CAF50;" th:href="@{/toLogin}">返回登录页</a>
+    </p>
+</div>
+
+<!-- 引入公共页尾片段 -->
+<div th:replace="~{common::foot(year=2025, company='JavaEE实验')}"></div>
+</body>
+</html>

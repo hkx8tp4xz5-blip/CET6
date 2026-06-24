@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${exam.title}">考试详情</title>
+    <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/exam" class="nav-brand">📚 英语四六级真题练习</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/exam">首页</a> &gt; <span th:text="${exam.title}">考试详情</span>
+        </div>
+
+        <div class="exam-header">
+            <h1 th:text="${exam.title}">考试标题</h1>
+            <div class="exam-meta">
+                <span class="badge" th:classappend="${exam.type == 'cet4' ? 'badge-cet4' : 'badge-cet6'}" th:text="${exam.type == 'cet4' ? '四级' : '六级'}">级别</span>
+                <span class="meta-item" th:text="${exam.year} + '年'">年份</span>
+                <span class="meta-item" th:text="${exam.session == '06' ? '6月' : '12月'}">月份</span>
+            </div>
+        </div>
+
+        <h2>📖 阅读理解</h2>
+        <div class="passage-list">
+            <div class="passage-card" th:each="passage : ${passages}">
+                <div class="passage-card-header">
+                    <span class="passage-type" th:classappend="'type-' + ${#strings.toLowerCase(passage.sectionType)}" th:text="${passage.title}">文章标题</span>
+                    <span class="question-count" th:text="${#lists.size(passage.questions)} + '题'">题量</span>
+                </div>
+                <div class="passage-card-body">
+                    <p class="passage-preview" th:text="${#strings.substring(passage.content, 0, 100)} + '...'">预览</p>
+                </div>
+                <div class="passage-card-footer">
+                    <a th:href="@{/exam/{examId}/reading/{passageId}(examId=${exam.id}, passageId=${passage.id})}" class="btn-start">开始做题 →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 听力部分 -->
+        <h2>🎧 听力理解</h2>
+        <div class="passage-list">
+            <div class="passage-card" th:each="section : ${exam.listeningSections}">
+                <div class="passage-card-header">
+                    <span class="passage-type type-listening">🎧 听力</span>
+                    <span class="question-count" th:text="${#lists.size(section.questions)} + '题'">题量</span>
+                </div>
+                <div class="passage-card-body">
+                    <p class="passage-preview" th:text="${#strings.substring(section.script, 0, 100)} + '...'">预览</p>
+                </div>
+                <div class="passage-card-footer">
+                    <a th:href="@{/exam/{examId}/listening/{sectionId}(examId=${exam.id}, sectionId=${section.id})}" class="btn-start">开始做题 →</a>
+                </div>
+            </div>
+        </div>
+
+        <h2>🌐 翻译</h2>
+        <div class="translation-card">
+            <div class="passage-card-body">
+                <p class="passage-preview" th:text="${#strings.substring(translation.chineseText, 0, 100)} + '...'">翻译预览</p>
+            </div>
+            <div class="passage-card-footer">
+                <a th:href="@{/exam/{examId}/translation(examId=${exam.id})}" class="btn-start">开始翻译 →</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="common :: foot(2026, '英语四六级真题在线练习系统')"></div>
+</body>
+</html>

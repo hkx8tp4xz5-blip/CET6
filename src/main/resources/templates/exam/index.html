@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语四六级真题在线练习</title>
+    <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/exam" class="nav-brand">📚 英语四六级真题练习</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>选择真题开始练习</h1>
+            <p>收录近5年英语六级真题，包含听力、阅读理解和翻译部分</p>
+        </div>
+
+        <div class="exam-section">
+            <h2 class="section-title">CET-6 大学英语六级</h2>
+            <div class="exam-grid">
+                <div class="exam-card" th:each="exam : ${cet6Exams}">
+                    <div class="exam-card-header">
+                        <span class="exam-badge cet6">六级</span>
+                        <span class="exam-year" th:text="${exam.year}">2025</span>
+                    </div>
+                    <div class="exam-card-body">
+                        <h3 class="exam-title" th:text="${exam.title}">2025年6月考试</h3>
+                        <p class="exam-session" th:text="${exam.session == '06' ? '6月' : '12月'}">6月</p>
+                    </div>
+                    <div class="exam-card-footer">
+                        <a th:href="@{/exam/{id}(id=${exam.id})}" class="btn-start">开始练习 →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="common :: foot(2026, '英语四六级真题在线练习系统')"></div>
+</body>
+</html>

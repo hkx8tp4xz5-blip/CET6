@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>公共片段</title>
+</head>
+<body>
+<div th:fragment="foot(year, company)">
+    <div class="footer">
+        <p>&copy; [[${year}]] [[${company}]]. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

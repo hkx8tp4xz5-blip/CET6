@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${exam.title} + ' - 翻译练习'">翻译练习</title>
+    <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/exam" class="nav-brand">📚 英语四六级真题练习</a>
+            <div class="nav-links">
+                <a th:href="@{/exam/{id}(id=${exam.id})}" class="nav-link">返回详情</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="reading-header">
+        <div class="container">
+            <div class="reading-info">
+                <span class="badge" th:classappend="${exam.type == 'cet4' ? 'badge-cet4' : 'badge-cet6'}" th:text="${exam.type == 'cet4' ? 'CET-4' : 'CET-6'}">级别</span>
+                <span class="passage-section-title">🌐 翻译练习</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container translation-layout">
+        <div class="translation-left">
+            <div class="translation-panel-header">
+                <h3>中文原文</h3>
+            </div>
+            <div class="chinese-content" id="chineseContent">
+                <p th:utext="${#strings.replace(translation.chineseText, newLine, '<br>')}">中文原文</p>
+            </div>
+        </div>
+
+        <div class="translation-right">
+            <div class="translation-panel-header">
+                <h3>英文翻译</h3>
+            </div>
+            <textarea class="translation-input" id="translationInput" placeholder="在此输入你的英文翻译..."></textarea>
+
+            <div class="translation-actions">
+                <button class="btn-check" onclick="showReference()">📖 显示参考答案</button>
+                <button class="btn-check" style="background: linear-gradient(135deg, #7F8C8D, #6C7A7D);" onclick="toggleExplanation()">📝 查看解析</button>
+            </div>
+
+            <div class="reference-answer" id="referenceAnswer" style="display:none;">
+                <h4>📖 参考答案</h4>
+                <p th:text="${translation.englishAnswer}">英文答案</p>
+            </div>
+
+            <div class="key-points">
+                <h4>💡 考点提示</h4>
+                <ul>
+                    <li th:each="point : ${translation.keyPoints}" th:text="${point}">考点</li>
+                </ul>
+            </div>
+
+            <div class="explanation-box" id="translationExplanation" style="display:none;">
+                <div class="explanation-header">
+                    <span class="explanation-title">翻译解析</span>
+                </div>
+                <p class="explain-content" th:text="${translation.explanation}">解析内容</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container nav-buttons">
+        <a th:href="@{/exam/{id}(id=${exam.id})}" class="btn-nav">← 返回详情</a>
+        <a href="/exam" class="btn-nav primary">返回首页 →</a>
+    </div>
+
+    <div th:replace="common :: foot(2026, '英语四六级真题在线练习系统')"></div>
+
+    <script src="/js/exam.js"></script>
+</body>
+</html>

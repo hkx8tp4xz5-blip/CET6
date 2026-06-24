@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${exam.title} + ' - 阅读理解'">阅读理解</title>
+    <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/exam" class="nav-brand">📚 英语四六级真题练习</a>
+            <div class="nav-links">
+                <a th:href="@{/exam/{id}(id=${exam.id})}" class="nav-link">返回详情</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="reading-header">
+        <div class="container">
+            <div class="reading-info" th:attr="data-section-type=${passage.sectionType}">
+                <span class="badge" th:classappend="${exam.type == 'cet4' ? 'badge-cet4' : 'badge-cet6'}" th:text="${exam.type == 'cet4' ? 'CET-4' : 'CET-6'}">级别</span>
+                <span class="passage-section-title" th:text="${passage.title}">文章标题</span>
+                <span class="progress-text" th:text="'第' + (${currentIndex} + 1) + '/' + ${#lists.size(passages)} + '篇'">进度</span>
+                <div class="header-tools">
+                    <span class="highlight-tip">🖍️ 选中文字即可高亮</span>
+                    <button class="tool-btn" id="clearHighlightBtn" onclick="clearHighlights()">🗑️ 清除高亮</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container reading-layout">
+        <div class="reading-left" id="readingLeft">
+            <div class="passage-content" id="passageContent">
+                <p th:each="para : ${passage.contentParagraphs}" th:utext="${#strings.replace(para, newLine, '<br>')}">段落内容</p>
+            </div>
+            <div class="word-bank" th:if="${passage.sectionType != 'BANKED_CLOZE' and passage.wordBank != null}">
+                <h4>📝 备选词库（点击单词，再点击右侧填空位填入）</h4>
+                <div class="word-bank-items">
+                    <span class="word-item" th:each="word : ${passage.wordBank}" th:attr="data-word-letter=${#strings.substring(word, 0, 1)}" th:text="${word}">word</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reading-right" id="readingRight">
+            <div th:if="${passage.sectionType == 'BANKED_CLOZE'}">
+                <div class="banked-header">
+                    <h3>📝 备选词库（15选10）</h3>
+                    <p class="banked-tip">拖拽单词到原文空白处，点击已填单词可撤回</p>
+                </div>
+                <div class="word-bank-grid" id="wordBankGrid">
+                    <div class="word-bank-item" th:each="word : ${passage.wordBank}"
+                         th:attr="data-word-letter=${#strings.substring(word, 0, 1)}"
+                         draggable="true">
+                        <span class="word-letter" th:text="${#strings.substring(word, 0, 1)}">A</span>
+                        <span class="word-text" th:text="${#strings.substring(word, 2)}">minimize</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-check" onclick="checkAnswers()">✅ 核对答案</button>
+                    <button class="btn-check btn-reset" onclick="resetAnswers()">🔄 重做</button>
+                </div>
+            </div>
+
+            <div th:if="${passage.sectionType != 'BANKED_CLOZE'}">
+                <div class="questions-header">
+                    <h3>📝 题目</h3>
+                    <span class="question-count" th:text="${#lists.size(passage.questions)} + '题'">题数</span>
+                </div>
+                <div class="questions-list" id="questionsList">
+                    <div class="question-item" th:each="q : ${passage.questions}" th:id="'q-' + ${q.id}">
+                        <div class="question-text">
+                            <span class="q-number" th:text="${q.questionNumber} + '.'">1.</span>
+                            <span th:text="${q.questionText}">题目内容</span>
+                        </div>
+                        <div class="options" th:id="'options-' + ${q.id}">
+                            <div class="option-item" th:each="opt : ${q.options}"
+                                 th:attr="data-question-id=${q.id}, data-option-value=${#strings.substring(opt, 0, 1)}"
+                                 onclick="selectOption(this)">
+                                <span class="option-label" th:text="${#strings.substring(opt, 0, 1)} + '.'">A.</span>
+                                <span th:text="${#strings.substring(opt, 2)}">选项内容</span>
+                            </div>
+                        </div>
+                        <div class="explanation-box" th:id="'explain-' + ${q.id}" style="display:none;">
+                            <div class="explanation-header">
+                                <span class="explanation-title">解析</span>
+                                <span class="correct-answer" th:text="'正确答案：' + ${q.correctAnswer}">答案</span>
+                            </div>
+                            <p class="explain-content" th:text="${q.explanation}">解析内容</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-check" onclick="checkAnswers()">✅ 核对答案</button>
+                    <button class="btn-check btn-reset" onclick="resetAnswers()">🔄 重做</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${passage.sectionType == 'BANKED_CLOZE'}">
+        <div class="container banked-explanations" id="bankedExplanations" style="display:none;">
+            <h3>📖 答案解析</h3>
+            <div class="banked-explanation-list" id="bankedExplanationList">
+                <div class="banked-explanation-item" th:each="q : ${passage.questions}" th:id="'banked-exp-' + ${q.id}">
+                    <div class="banked-exp-header">
+                        <span class="banked-exp-num" th:text="'第' + ${q.questionNumber} + '题'">第1题</span>
+                        <span class="correct-answer" th:text="'正确答案：' + ${q.correctAnswer}">答案</span>
+                    </div>
+                    <p class="banked-exp-text" th:text="${q.explanation}">解析内容</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="translation-popup" id="translationPopup" style="display:none;">
+        <div class="translation-popup-header">
+            <span id="selectedWord"></span>
+            <button class="popup-highlight-btn" id="popupHighlightBtn" onclick="highlightFromPopup()">🖍️ 高亮</button>
+            <button class="popup-close" onclick="closeTranslation()">✕</button>
+        </div>
+    </div>
+
+    <div class="container nav-buttons">
+        <a th:if="${currentIndex > 0}" th:href="@{/exam/{examId}/reading/{passageId}(examId=${exam.id}, passageId=${passages[currentIndex - 1].id})}" class="btn-nav">← 上一篇</a>
+        <span th:if="${currentIndex == 0}"></span>
+        <a th:if="${currentIndex < #lists.size(passages) - 1}" th:href="@{/exam/{examId}/reading/{passageId}(examId=${exam.id}, passageId=${passages[currentIndex + 1].id})}" class="btn-nav primary">下一篇 →</a>
+        <a th:if="${currentIndex >= #lists.size(passages) - 1}" th:href="@{/exam/{examId}/translation(examId=${exam.id})}" class="btn-nav primary">翻译练习 →</a>
+    </div>
+
+    <div th:replace="common :: foot(2026, '英语四六级真题在线练习系统')"></div>
+
+    <script src="/js/exam.js"></script>
+</body>
+</html>

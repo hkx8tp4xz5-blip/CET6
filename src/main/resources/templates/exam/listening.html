@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${exam.title} + ' - 听力理解'">听力理解</title>
+    <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/exam" class="nav-brand">📚 英语四六级真题练习</a>
+            <div class="nav-links">
+                <a th:href="@{/exam/{id}(id=${exam.id})}" class="nav-link">返回详情</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="reading-header">
+        <div class="container">
+            <div class="reading-info">
+                <span class="badge" th:classappend="${exam.type == 'cet4' ? 'badge-cet4' : 'badge-cet6'}" th:text="${exam.type == 'cet4' ? 'CET-4' : 'CET-6'}">级别</span>
+                <span class="passage-section-title" th:text="${section.title}">听力标题</span>
+                <span class="progress-text" th:text="'第' + (${currentIndex} + 1) + '/' + ${#lists.size(sections)} + '篇'">进度</span>
+                <div class="header-tools">
+                    <span class="highlight-tip">🖍️ 选中文字即可高亮</span>
+                    <button class="tool-btn" id="clearHighlightBtn" onclick="clearHighlights()">🗑️ 清除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container reading-layout">
+        <div class="reading-left" id="readingLeft">
+            <div class="passage-content" id="passageContent">
+                <div class="listening-header">
+                    <span class="passage-title">听力原文</span>
+                    <a th:if="${section.audioUrl != null}" th:href="${section.audioUrl}" class="tool-btn" target="_blank">🔊 播放音频</a>
+                </div>
+                <p th:utext="${#strings.replace(section.script, newLine, '<br>')}">听力原文内容</p>
+            </div>
+        </div>
+
+        <div class="reading-right" id="readingRight">
+            <div class="questions-header">
+                <h3>📝 题目</h3>
+                <span class="question-count" th:text="${#lists.size(section.questions)} + '题'">题数</span>
+            </div>
+
+            <div class="questions-list" id="questionsList">
+                <div class="question-item" th:each="q : ${section.questions}" th:id="'q-' + ${q.id}">
+                    <div class="question-text">
+                        <span class="q-number" th:text="${q.questionNumber} + '.'">1.</span>
+                        <span th:text="${q.questionText}">题目内容</span>
+                    </div>
+                    <div class="options" th:id="'options-' + ${q.id}">
+                        <div class="option-item" th:each="opt : ${q.options}"
+                             th:attr="data-question-id=${q.id}, data-option-value=${#strings.substring(opt, 0, 1)}"
+                             onclick="selectOption(this)">
+                            <span class="option-label" th:text="${#strings.substring(opt, 0, 1)} + '.'">A.</span>
+                            <span th:text="${#strings.substring(opt, 2)}">选项内容</span>
+                        </div>
+                    </div>
+                    <div class="explanation-box" th:id="'explain-' + ${q.id}" style="display:none;">
+                        <div class="explanation-header">
+                            <span class="explanation-title">解析</span>
+                            <span class="correct-answer" th:text="'正确答案：' + ${q.correctAnswer}">答案</span>
+                        </div>
+                        <p class="explain-content" th:text="${q.explanation}">解析内容</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-check" onclick="checkAnswers()">✅ 核对答案</button>
+                <button class="btn-check btn-reset" onclick="resetAnswers()">🔄 重做</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="translation-popup" id="translationPopup" style="display:none;">
+        <div class="translation-popup-header">
+            <span id="selectedWord"></span>
+            <button class="popup-highlight-btn" id="popupHighlightBtn" onclick="highlightFromPopup()">🖍️ 高亮</button>
+            <button class="popup-close" onclick="closeTranslation()">✕</button>
+        </div>
+    </div>
+
+    <div class="container nav-buttons">
+        <a th:if="${currentIndex > 0}" th:href="@{/exam/{examId}/listening/{sectionId}(examId=${exam.id}, sectionId=${sections[currentIndex - 1].id})}" class="btn-nav">← 上一篇</a>
+        <span th:if="${currentIndex == 0}"></span>
+        <a th:if="${currentIndex < #lists.size(sections) - 1}" th:href="@{/exam/{examId}/listening/{sectionId}(examId=${exam.id}, sectionId=${sections[currentIndex + 1].id})}" class="btn-nav primary">下一篇 →</a>
+        <a th:if="${currentIndex >= #lists.size(sections) - 1}" th:href="@{/exam/{examId}/translation(examId=${exam.id})}" class="btn-nav primary">翻译练习 →</a>
+    </div>
+
+    <div th:replace="common :: foot(2026, '英语四六级真题在线练习系统')"></div>
+
+    <script src="/js/exam.js"></script>
+</body>
+</html>
